@@ -32,7 +32,6 @@ add_pack() {
     echo "Pack '$pack_name' added successfully."
 }
 
-# Removes a pack from the database json file
 remove() {
     local pack_name="$1"
     if [[ -z "$pack_name" ]]; then
@@ -84,6 +83,14 @@ if [[ "$1" == "add" ]]; then
     shift
     add_pack "$@"
     exit $? # Exit after adding a pack
+fi
+# mode to list packs
+if [[ "$1" == "list" ]]; then
+    echo "Available packs:"
+    for pack in "${!packs[@]}"; do
+        echo "- $pack: ${packs[$pack]}"
+    done
+    exit 0 # Exit after listing packs
 fi
 # mode to remove a pack
 if [[ "$1" == "remove" ]]; then
