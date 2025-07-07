@@ -21,6 +21,15 @@ if [[ ! -v "packs[$1]" ]]; then
     exit 1
 fi
 
+# check number of packs
+cd "$workdir"
+numpacks=$(ls -d */ | wc -l)
+if [ "$numpacks" -ne "${#packs[@]}" ]; then
+    echo "Number of packs does not match the database."
+    echo "Perhaps you forgot to update the database?"
+    exit 1
+fi
+
 # change to the pack directory
 packdir="${workdir}${packs[$1]}"
 cd "$packdir"
