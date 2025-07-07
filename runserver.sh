@@ -32,6 +32,22 @@ add_pack() {
     echo "Pack '$pack_name' added successfully."
 }
 
+# Removes a pack from the database json file
+remove() {
+    local pack_name="$1"
+    if [[ -z "$pack_name" ]]; then
+        echo "Usage: $0 remove <pack_name>"
+        exit 1
+    fi
+    if [[ ! -v "packs[$pack_name]" ]]; then
+        echo "Pack '$pack_name' does not exist."
+        exit 1
+    fi
+    unset "packs[$pack_name]"
+    jq --arg key "$pack_name" 'del(.[$key])' "$database" > tmp.json && mv tmp.json "$database"
+    echo "Pack '$pack_name' removed successfully."
+}
+
 # Runs the server for the specified pack
 run(){
     # Check if the first argument is provided and is a valid pack
@@ -69,7 +85,12 @@ if [[ "$1" == "add" ]]; then
     add_pack "$@"
     exit $? # Exit after adding a pack
 fi
-
+# mode to remove a pack
+if [[ "$1" == "remove" ]]; then
+    shift
+    remove "$@"
+    exit 0 # Exit after removing a pack
+fi
 # mode to run a pack
 if [[ "$1" == "run" ]]; then
     shift
