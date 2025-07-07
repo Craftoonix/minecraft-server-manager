@@ -1,7 +1,7 @@
 #!/bin/bash
 
-workdir="/home/jowosh/netowork-share/minecraft-servers"
-database="${workdir}/database.json"
+work_dir="/home/jowosh/netowork-share/minecraft-servers"
+database="${work_dir}/database.json"
 
 # check if database file exists
 if [ ! -f "$database" ]; then
@@ -15,6 +15,7 @@ while IFS="=" read -r key value; do
     packs["$key"]="$value"
 done < <(jq -r 'to_entries | map("\(.key)=\(.value)") | .[]' "$database")
 
+
 # Adds a pack to the database json file
 add_pack() {
     local pack_name="$1"
@@ -25,6 +26,10 @@ add_pack() {
     fi
     if [[ -v "packs[$pack_name]" ]]; then
         echo "Pack '$pack_name' already exists."
+        return 1
+    fi
+    if [[ ! -d "$work_dir$pack_path" ]]; then
+        echo "Pack path '$pack_path' does not exist."
         return 1
     fi
     packs["$pack_name"]="$pack_path"
@@ -56,7 +61,7 @@ run(){
     fi
 
     # check number of packs
-    cd "$workdir"
+    cd "$work_dir"
     numpacks=$(ls -d */ | wc -l)
     if [ "$numpacks" -ne "${#packs[@]}" ]; then
         echo "Number of packs does not match the database."
@@ -65,7 +70,7 @@ run(){
     fi
 
     # change to the pack directory
-    packdir="${workdir}${packs[$1]}"
+    packdir="${work_dir}${packs[$1]}"
     cd "$packdir"
 
     # Check if run.sh exists in the pack directory
