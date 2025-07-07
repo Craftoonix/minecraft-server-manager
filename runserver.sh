@@ -1,11 +1,19 @@
 #!/bin/bash
 
 workdir="/home/jowosh/netowork-share/minecraft-servers"
+database="${workdir}/database.json"
 
-declare -A packs=(
-    ["p2"]="/prominence-2"
-    ["cte2"]="/craft-to-exile-2"
-)
+# check if database file exists
+if [ ! -f "$database" ]; then
+    echo "Database file not found: $database"
+    exit 1
+fi
+
+# import packs from database
+declare -A packs
+while IFS="=" read -r key value; do
+    packs["$key"]="$value"
+done < <(jq -r 'to_entries | map("\(.key)=\(.value)") | .[]' "$database")
 
 # Check if the first argument is provided and is a valid pack
 if [[ ! -v "packs[$1]" ]]; then
